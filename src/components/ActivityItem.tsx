@@ -19,7 +19,7 @@ const ActivityItem = ({ activity, trainId }: ActivityItemProps) => {
   });
 
   // Base classes for all activity items
-  const baseClasses = "p-1 text-xs rounded mb-1 cursor-move transition-opacity";
+  const baseClasses = "p-2 text-xs rounded mb-1 cursor-move transition-opacity";
   
   // Choose color based on activity type
   const getActivityColor = (activityType: number) => {
@@ -50,8 +50,8 @@ const ActivityItem = ({ activity, trainId }: ActivityItemProps) => {
       )}
     >
       <div className="flex justify-between items-center">
-        <span>{activity.name}</span>
-        <span className="flex items-center gap-1 ml-1 bg-black/20 px-1 rounded">
+        <span className="truncate mr-1">{activity.name}</span>
+        <span className="flex items-center gap-1 whitespace-nowrap bg-black/20 px-1 rounded">
           <Clock size={10} />
           {activity.manHours}h
         </span>

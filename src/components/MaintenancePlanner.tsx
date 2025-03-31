@@ -8,6 +8,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { toast } from "sonner";
 import { Train, Activity, ShiftType, ShiftManHours } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const MaintenancePlanner = () => {
   const [trains, setTrains] = useState<Train[]>([]);
@@ -102,8 +103,8 @@ const MaintenancePlanner = () => {
         </div>
 
         <div className={cn("bg-white rounded-lg shadow-md overflow-hidden")}>
-          <div className="overflow-x-auto">
-            <div className="min-w-[1200px]">
+          <ScrollArea className="h-[calc(100vh-200px)]" orientation="horizontal">
+            <div className="min-w-[1800px]">
               <CalendarHeader shiftManHours={shiftManHours} />
               <TrainList 
                 trains={trains} 
@@ -111,7 +112,7 @@ const MaintenancePlanner = () => {
                 onActivityMove={handleActivityMove} 
               />
             </div>
-          </div>
+          </ScrollArea>
         </div>
       </div>
     </DndProvider>

@@ -49,7 +49,7 @@ const ShiftCell = ({
     <div
       ref={drop}
       className={cn(
-        "p-1 min-h-[100px] transition-colors flex flex-col",
+        "p-2 min-h-[120px] transition-colors flex flex-col",
         shift === "day" ? "bg-blue-50 border-r" : "bg-indigo-50",
         isOver && canDrop && "bg-green-100",
         plannedManHours > availableManHours ? "border-red-500 border-2" : ""

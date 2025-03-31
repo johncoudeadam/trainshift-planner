@@ -19,6 +19,12 @@ const CalendarHeader = ({ shiftManHours }: CalendarHeaderProps) => {
     return shiftData ? shiftData.availableManHours : 0;
   };
 
+  // Helper function to calculate total planned hours for a day and shift
+  const getTotalPlannedHours = (day: number, shift: string): number => {
+    // This would need real data, but for now we're just showing available hours
+    return 0; // This will be implemented later when we have actual data
+  };
+
   return (
     <div className="flex border-b">
       <div className="w-48 min-w-48 p-3 font-medium text-gray-700 bg-gray-50 border-r">
@@ -33,10 +39,14 @@ const CalendarHeader = ({ shiftManHours }: CalendarHeaderProps) => {
             </div>
             <div className="grid grid-cols-2">
               <div className="p-2 text-center text-sm border-r bg-blue-50">
-                Day ({getAvailableManHours(index, "day")}h)
+                <div className={getTotalPlannedHours(index, "day") > getAvailableManHours(index, "day") ? "text-red-600 font-bold" : ""}>
+                  {getTotalPlannedHours(index, "day")}h / {getAvailableManHours(index, "day")}h
+                </div>
               </div>
               <div className="p-2 text-center text-sm bg-indigo-50">
-                Night ({getAvailableManHours(index, "night")}h)
+                <div className={getTotalPlannedHours(index, "night") > getAvailableManHours(index, "night") ? "text-red-600 font-bold" : ""}>
+                  {getTotalPlannedHours(index, "night")}h / {getAvailableManHours(index, "night")}h
+                </div>
               </div>
             </div>
           </div>

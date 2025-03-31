@@ -21,9 +21,8 @@ const ShiftManHoursDisplay = ({
   return (
     <div className="text-xs p-1">
       <div className="flex justify-between items-center">
-        <span>Available: {availableManHours}h</span>
         <span className={isOverAllocated ? "text-red-600 font-bold" : "text-gray-700"}>
-          Used: {plannedManHours}h
+          {plannedManHours}h / {availableManHours}h
         </span>
       </div>
       
