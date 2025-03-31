@@ -1,14 +1,17 @@
 
 import { ReactNode } from "react";
 import { useDrop } from "react-dnd";
-import { ShiftType } from "@/lib/types";
+import { ShiftType, Activity } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import ShiftManHoursDisplay from "./ShiftManHoursDisplay";
 
 interface ShiftCellProps {
   children: ReactNode;
   trainId: string;
   day: number;
   shift: ShiftType;
+  activities: Activity[];
+  availableManHours: number;
   onActivityMove: (
     activityId: string,
     trainId: string,
@@ -17,7 +20,15 @@ interface ShiftCellProps {
   ) => void;
 }
 
-const ShiftCell = ({ children, trainId, day, shift, onActivityMove }: ShiftCellProps) => {
+const ShiftCell = ({ 
+  children, 
+  trainId, 
+  day, 
+  shift, 
+  activities, 
+  availableManHours,
+  onActivityMove 
+}: ShiftCellProps) => {
   const [{ isOver, canDrop }, drop] = useDrop({
     accept: "activity",
     drop: (item: { id: string; trainId: string }) => {
@@ -29,16 +40,30 @@ const ShiftCell = ({ children, trainId, day, shift, onActivityMove }: ShiftCellP
     }),
   });
 
+  // Calculate total planned man-hours for this cell
+  const plannedManHours = activities.reduce((total, activity) => {
+    return total + activity.manHours;
+  }, 0);
+
   return (
     <div
       ref={drop}
       className={cn(
-        "p-1 min-h-[80px] transition-colors",
+        "p-1 min-h-[100px] transition-colors flex flex-col",
         shift === "day" ? "bg-blue-50 border-r" : "bg-indigo-50",
-        isOver && canDrop && "bg-green-100"
+        isOver && canDrop && "bg-green-100",
+        plannedManHours > availableManHours ? "border-red-500 border-2" : ""
       )}
     >
-      {children}
+      <ShiftManHoursDisplay
+        day={day}
+        shift={shift}
+        availableManHours={availableManHours}
+        plannedManHours={plannedManHours}
+      />
+      <div className="flex-1">
+        {children}
+      </div>
     </div>
   );
 };

@@ -1,12 +1,23 @@
 
 import { format, addDays } from "date-fns";
+import { ShiftManHours } from "@/lib/types";
 
-const CalendarHeader = () => {
+interface CalendarHeaderProps {
+  shiftManHours: ShiftManHours[];
+}
+
+const CalendarHeader = ({ shiftManHours }: CalendarHeaderProps) => {
   // Get today's date
   const today = new Date();
   
   // Generate array of 14 days (2 weeks)
   const days = Array.from({ length: 14 }, (_, i) => addDays(today, i));
+
+  // Helper function to find available man-hours for a shift
+  const getAvailableManHours = (day: number, shift: string): number => {
+    const shiftData = shiftManHours.find(s => s.day === day && s.shift === shift);
+    return shiftData ? shiftData.availableManHours : 0;
+  };
 
   return (
     <div className="flex border-b">
@@ -22,10 +33,10 @@ const CalendarHeader = () => {
             </div>
             <div className="grid grid-cols-2">
               <div className="p-2 text-center text-sm border-r bg-blue-50">
-                Day
+                Day ({getAvailableManHours(index, "day")}h)
               </div>
               <div className="p-2 text-center text-sm bg-indigo-50">
-                Night
+                Night ({getAvailableManHours(index, "night")}h)
               </div>
             </div>
           </div>

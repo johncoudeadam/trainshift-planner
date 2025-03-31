@@ -2,21 +2,24 @@
 import { useState, useEffect } from "react";
 import CalendarHeader from "./CalendarHeader";
 import TrainList from "./TrainList";
-import { generateInitialData } from "@/lib/data";
+import { generateInitialData, generateShiftManHours } from "@/lib/data";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { toast } from "sonner";
-import { Train, Activity, ShiftType } from "@/lib/types";
+import { Train, Activity, ShiftType, ShiftManHours } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const MaintenancePlanner = () => {
   const [trains, setTrains] = useState<Train[]>([]);
+  const [shiftManHours, setShiftManHours] = useState<ShiftManHours[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Generate initial data
     const initialData = generateInitialData();
+    const initialShiftManHours = generateShiftManHours();
     setTrains(initialData);
+    setShiftManHours(initialShiftManHours);
     setLoading(false);
   }, []);
 
@@ -54,7 +57,30 @@ const MaintenancePlanner = () => {
       });
     });
 
-    toast.success("Maintenance activity rescheduled");
+    // Calculate total man-hours after moving
+    const targetTrain = trains.find(t => t.id === trainId);
+    if (targetTrain) {
+      const activity = targetTrain.activities.find(a => a.id === activityId);
+      if (activity) {
+        // Check if this would cause overallocation
+        const shiftData = shiftManHours.find(s => s.day === targetDay && s.shift === targetShift);
+        if (shiftData) {
+          // Calculate current man-hours for the target shift
+          const currentManHours = trains.flatMap(t => t.activities)
+            .filter(a => a.day === targetDay && a.shift === targetShift && a.id !== activityId)
+            .reduce((sum, a) => sum + a.manHours, 0);
+          
+          // Add the moved activity's man-hours
+          const totalPlannedHours = currentManHours + activity.manHours;
+          
+          if (totalPlannedHours > shiftData.availableManHours) {
+            toast.warning(`Activity moved but causes resource overallocation! (${totalPlannedHours}/${shiftData.availableManHours} hours)`);
+          } else {
+            toast.success("Maintenance activity rescheduled");
+          }
+        }
+      }
+    }
   };
 
   if (loading) {
@@ -78,9 +104,10 @@ const MaintenancePlanner = () => {
         <div className={cn("bg-white rounded-lg shadow-md overflow-hidden")}>
           <div className="overflow-x-auto">
             <div className="min-w-[1200px]">
-              <CalendarHeader />
+              <CalendarHeader shiftManHours={shiftManHours} />
               <TrainList 
                 trains={trains} 
+                shiftManHours={shiftManHours}
                 onActivityMove={handleActivityMove} 
               />
             </div>

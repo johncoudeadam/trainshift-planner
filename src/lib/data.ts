@@ -1,5 +1,5 @@
 
-import { Train, Activity, ShiftType } from "./types";
+import { Train, Activity, ShiftType, ShiftManHours } from "./types";
 
 // Function to generate a random activity name
 const getActivityName = (type: number): string => {
@@ -17,6 +17,30 @@ const getActivityName = (type: number): string => {
   ];
   
   return activityTypes[type % activityTypes.length];
+};
+
+// Generate man-hours for all shifts
+export const generateShiftManHours = (): ShiftManHours[] => {
+  const shifts: ShiftManHours[] = [];
+  
+  // Generate for 14 days
+  for (let day = 0; day < 14; day++) {
+    // Day shift
+    shifts.push({
+      day,
+      shift: "day",
+      availableManHours: Math.floor(Math.random() * 20) + 20, // 20-40 man-hours
+    });
+    
+    // Night shift
+    shifts.push({
+      day,
+      shift: "night",
+      availableManHours: Math.floor(Math.random() * 15) + 15, // 15-30 man-hours
+    });
+  }
+  
+  return shifts;
 };
 
 // Generate initial data
@@ -41,6 +65,7 @@ export const generateInitialData = (): Train[] => {
         optimalDay,
         optimalShift,
         isOutOfOptimalTime: false,
+        manHours: Math.floor(Math.random() * 8) + 2, // 2-10 man-hours per activity
       };
     });
     

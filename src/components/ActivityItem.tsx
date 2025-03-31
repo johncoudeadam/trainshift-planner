@@ -2,6 +2,7 @@
 import { useDrag } from "react-dnd";
 import { Activity } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { Clock } from "lucide-react";
 
 interface ActivityItemProps {
   activity: Activity;
@@ -44,11 +45,17 @@ const ActivityItem = ({ activity, trainId }: ActivityItemProps) => {
         baseClasses,
         getActivityColor(activity.type),
         isDragging ? "opacity-50" : "opacity-100",
-        activity.isOutOfOptimalTime && "border-2 border-red-500",
+        activity.isOutOfOptimalTime && "border-2 border-yellow-300",
         "text-white"
       )}
     >
-      {activity.name}
+      <div className="flex justify-between items-center">
+        <span>{activity.name}</span>
+        <span className="flex items-center gap-1 ml-1 bg-black/20 px-1 rounded">
+          <Clock size={10} />
+          {activity.manHours}h
+        </span>
+      </div>
     </div>
   );
 };

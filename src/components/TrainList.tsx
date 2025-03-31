@@ -1,11 +1,12 @@
 
-import { Train, Activity, ShiftType } from "@/lib/types";
+import { Train, Activity, ShiftType, ShiftManHours } from "@/lib/types";
 import ActivityItem from "./ActivityItem";
 import ShiftCell from "./ShiftCell";
 import { TrainFront } from "lucide-react";
 
 interface TrainListProps {
   trains: Train[];
+  shiftManHours: ShiftManHours[];
   onActivityMove: (
     activityId: string,
     trainId: string, 
@@ -14,15 +15,22 @@ interface TrainListProps {
   ) => void;
 }
 
-const TrainList = ({ trains, onActivityMove }: TrainListProps) => {
+const TrainList = ({ trains, shiftManHours, onActivityMove }: TrainListProps) => {
   // Generate day numbers (0-13) for 2 weeks
   const days = Array.from({ length: 14 }, (_, i) => i);
   
-  // Get all shifts for each day (day and night)
-  const shifts: { day: number; shift: ShiftType }[] = days.flatMap((day) => [
-    { day, shift: "day" as ShiftType },
-    { day, shift: "night" as ShiftType },
-  ]);
+  // Helper function to find available man-hours for a shift
+  const getAvailableManHours = (day: number, shift: ShiftType): number => {
+    const shiftData = shiftManHours.find(s => s.day === day && s.shift === shift);
+    return shiftData ? shiftData.availableManHours : 0;
+  };
+
+  // Helper function to get activities for a specific cell
+  const getActivitiesForCell = (train: Train, day: number, shift: ShiftType): Activity[] => {
+    return train.activities.filter(
+      (activity) => activity.day === day && activity.shift === shift
+    );
+  };
 
   return (
     <div>
@@ -36,37 +44,40 @@ const TrainList = ({ trains, onActivityMove }: TrainListProps) => {
             {days.map((day) => (
               <div key={day} className="border-r last:border-r-0 grid grid-cols-1">
                 <div className="grid grid-cols-2 h-full">
+                  {/* Day Shift Cell */}
                   <ShiftCell
                     trainId={train.id}
                     day={day}
                     shift="day"
+                    activities={getActivitiesForCell(train, day, "day")}
+                    availableManHours={getAvailableManHours(day, "day")}
                     onActivityMove={onActivityMove}
                   >
-                    {train.activities
-                      .filter((activity) => activity.day === day && activity.shift === "day")
-                      .map((activity) => (
-                        <ActivityItem 
-                          key={activity.id} 
-                          activity={activity} 
-                          trainId={train.id} 
-                        />
-                      ))}
+                    {getActivitiesForCell(train, day, "day").map((activity) => (
+                      <ActivityItem 
+                        key={activity.id} 
+                        activity={activity} 
+                        trainId={train.id} 
+                      />
+                    ))}
                   </ShiftCell>
+                  
+                  {/* Night Shift Cell */}
                   <ShiftCell
                     trainId={train.id}
                     day={day}
                     shift="night"
+                    activities={getActivitiesForCell(train, day, "night")}
+                    availableManHours={getAvailableManHours(day, "night")}
                     onActivityMove={onActivityMove}
                   >
-                    {train.activities
-                      .filter((activity) => activity.day === day && activity.shift === "night")
-                      .map((activity) => (
-                        <ActivityItem 
-                          key={activity.id} 
-                          activity={activity} 
-                          trainId={train.id} 
-                        />
-                      ))}
+                    {getActivitiesForCell(train, day, "night").map((activity) => (
+                      <ActivityItem 
+                        key={activity.id} 
+                        activity={activity} 
+                        trainId={train.id} 
+                      />
+                    ))}
                   </ShiftCell>
                 </div>
               </div>
