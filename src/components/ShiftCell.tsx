@@ -1,9 +1,14 @@
-
 import { ReactNode } from "react";
 import { useDrop } from "react-dnd";
 import { ShiftType, Activity } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import ShiftManHoursDisplay from "./ShiftManHoursDisplay";
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger 
+} from "@/components/ui/tooltip";
+import { AlertTriangle } from "lucide-react";
 
 interface ShiftCellProps {
   children: ReactNode;
@@ -68,11 +73,22 @@ const ShiftCell = ({
     return "";
   };
 
-  return (
+  // Calculate if the shift would be overallocated
+  const isDraggingOver = isOver && canDrop && item;
+  const draggedActivityManHours = item?.id ? 
+    // If the activity is from the same cell, don't count it twice
+    (item.trainId === trainId && item.optimalDay === day && item.optimalShift === shift) ? 0 : 
+    // Otherwise, add its manhours
+    (item?.manHours || 0) : 0;
+  
+  const totalPlannedWithDragged = plannedManHours + draggedActivityManHours;
+  const isOverallocated = totalPlannedWithDragged > availableManHours;
+
+  // Cell content with or without tooltip
+  const cellContent = (
     <div
-      ref={drop}
       className={cn(
-        "p-2 min-h-[120px] transition-colors flex flex-col",
+        "p-2 min-h-[120px] transition-colors flex flex-col w-full h-full",
         shift === "day" ? "bg-blue-50 border-r" : "bg-indigo-50",
         isOver && canDrop && "bg-green-300",
         getProximityHighlight(),
@@ -89,6 +105,28 @@ const ShiftCell = ({
       <div className="flex-1">
         {children}
       </div>
+    </div>
+  );
+
+  return (
+    <div ref={drop} className="w-full h-full">
+      {isDraggingOver ? (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            {cellContent}
+          </TooltipTrigger>
+          <TooltipContent className="flex items-center gap-2">
+            <span>
+              {totalPlannedWithDragged}h / {availableManHours}h
+            </span>
+            {isOverallocated && (
+              <AlertTriangle size={16} className="text-red-500" />
+            )}
+          </TooltipContent>
+        </Tooltip>
+      ) : (
+        cellContent
+      )}
     </div>
   );
 };
