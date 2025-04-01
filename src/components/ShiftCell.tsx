@@ -51,8 +51,22 @@ const ShiftCell = ({
     return total + activity.manHours;
   }, 0);
 
-  // Determine if this cell is within the optimal range (±2 days) of the dragged activity
-  const isWithinOptimalRange = item && Math.abs(day - item.optimalDay) <= 2;
+  // Only highlight cells in the same train as the dragged item
+  const isSameTrain = item && item.trainId === trainId;
+  
+  // Determine highlight color based on proximity to optimal day
+  const getProximityHighlight = () => {
+    if (!item || !isSameTrain) return "";
+    
+    const dayDifference = Math.abs(day - item.optimalDay);
+    
+    // Color gradient based on proximity (0-2 days)
+    if (dayDifference === 0 && shift === item.optimalShift) return "bg-green-200/80"; // Exact match
+    else if (dayDifference === 0) return "bg-green-100/70"; // Same day, different shift
+    else if (dayDifference === 1) return "bg-green-100/50"; // 1 day difference
+    else if (dayDifference === 2) return "bg-green-50/40"; // 2 days difference
+    return "";
+  };
 
   return (
     <div
@@ -60,8 +74,8 @@ const ShiftCell = ({
       className={cn(
         "p-2 min-h-[120px] transition-colors flex flex-col",
         shift === "day" ? "bg-blue-50 border-r" : "bg-indigo-50",
-        isOver && canDrop && "bg-green-100",
-        isWithinOptimalRange && item && !isOver && "bg-green-50/50", // Highlight optimal range with transparent green
+        isOver && canDrop && "bg-green-300",
+        getProximityHighlight(),
         plannedManHours > availableManHours ? "border-red-500 border-2" : ""
       )}
     >
