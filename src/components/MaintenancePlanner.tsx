@@ -103,7 +103,7 @@ const MaintenancePlanner = () => {
         </div>
 
         <div className={cn("bg-white rounded-lg shadow-md overflow-hidden")}>
-          <ScrollArea className="h-[calc(100vh-200px)]" orientation="horizontal">
+          <ScrollArea className="h-[calc(100vh-200px)]">
             <div className="min-w-[1800px]">
               <CalendarHeader shiftManHours={shiftManHours} />
               <TrainList 
