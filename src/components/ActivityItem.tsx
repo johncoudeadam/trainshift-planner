@@ -12,7 +12,12 @@ interface ActivityItemProps {
 const ActivityItem = ({ activity, trainId }: ActivityItemProps) => {
   const [{ isDragging }, drag] = useDrag({
     type: "activity",
-    item: { id: activity.id, trainId },
+    item: { 
+      id: activity.id, 
+      trainId,
+      optimalDay: activity.optimalDay,
+      optimalShift: activity.optimalShift
+    },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
