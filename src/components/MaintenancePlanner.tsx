@@ -105,7 +105,10 @@ const MaintenancePlanner = () => {
         <div className={cn("bg-white rounded-lg shadow-md overflow-hidden")}>
           <ScrollArea className="h-[calc(100vh-200px)]">
             <div className="min-w-[1800px]">
-              <CalendarHeader shiftManHours={shiftManHours} />
+              <CalendarHeader 
+                shiftManHours={shiftManHours}
+                trains={trains} 
+              />
               <TrainList 
                 trains={trains} 
                 shiftManHours={shiftManHours}

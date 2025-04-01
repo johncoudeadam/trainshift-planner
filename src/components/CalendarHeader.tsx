@@ -1,12 +1,13 @@
 
 import { format, addDays } from "date-fns";
-import { ShiftManHours } from "@/lib/types";
+import { ShiftManHours, Train } from "@/lib/types";
 
 interface CalendarHeaderProps {
   shiftManHours: ShiftManHours[];
+  trains: Train[]; // Added trains prop to calculate total hours
 }
 
-const CalendarHeader = ({ shiftManHours }: CalendarHeaderProps) => {
+const CalendarHeader = ({ shiftManHours, trains }: CalendarHeaderProps) => {
   // Get today's date
   const today = new Date();
   
@@ -21,8 +22,9 @@ const CalendarHeader = ({ shiftManHours }: CalendarHeaderProps) => {
 
   // Helper function to calculate total planned hours for a day and shift
   const getTotalPlannedHours = (day: number, shift: string): number => {
-    // This would need real data, but for now we're just showing available hours
-    return 0; // This will be implemented later when we have actual data
+    return trains.flatMap(train => train.activities)
+      .filter(activity => activity.day === day && activity.shift === shift)
+      .reduce((sum, activity) => sum + activity.manHours, 0);
   };
 
   return (
@@ -39,11 +41,13 @@ const CalendarHeader = ({ shiftManHours }: CalendarHeaderProps) => {
             </div>
             <div className="grid grid-cols-2">
               <div className="p-2 text-center text-sm border-r bg-blue-50">
+                {/* Day shift hours */}
                 <div className={getTotalPlannedHours(index, "day") > getAvailableManHours(index, "day") ? "text-red-600 font-bold" : ""}>
                   {getTotalPlannedHours(index, "day")}h / {getAvailableManHours(index, "day")}h
                 </div>
               </div>
               <div className="p-2 text-center text-sm bg-indigo-50">
+                {/* Night shift hours */}
                 <div className={getTotalPlannedHours(index, "night") > getAvailableManHours(index, "night") ? "text-red-600 font-bold" : ""}>
                   {getTotalPlannedHours(index, "night")}h / {getAvailableManHours(index, "night")}h
                 </div>

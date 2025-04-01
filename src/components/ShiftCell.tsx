@@ -60,6 +60,7 @@ const ShiftCell = ({
         shift={shift}
         availableManHours={availableManHours}
         plannedManHours={plannedManHours}
+        showAvailable={false}
       />
       <div className="flex-1">
         {children}

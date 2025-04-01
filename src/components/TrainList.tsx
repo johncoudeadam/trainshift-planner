@@ -3,6 +3,8 @@ import { Train, Activity, ShiftType, ShiftManHours } from "@/lib/types";
 import ActivityItem from "./ActivityItem";
 import ShiftCell from "./ShiftCell";
 import { TrainFront } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 interface TrainListProps {
   trains: Train[];
@@ -32,6 +34,20 @@ const TrainList = ({ trains, shiftManHours, onActivityMove }: TrainListProps) =>
     );
   };
 
+  // Helper function to calculate total planned man-hours for a day and shift across all trains
+  const getTotalPlannedHours = (day: number, shift: ShiftType): number => {
+    return trains.flatMap(train => train.activities)
+      .filter(activity => activity.day === day && activity.shift === shift)
+      .reduce((sum, activity) => sum + activity.manHours, 0);
+  };
+
+  // Check if a shift is overallocated
+  const isShiftOverallocated = (day: number, shift: ShiftType): boolean => {
+    const totalPlanned = getTotalPlannedHours(day, shift);
+    const available = getAvailableManHours(day, shift);
+    return totalPlanned > available;
+  };
+
   return (
     <div>
       {trains.map((train) => (
@@ -53,6 +69,17 @@ const TrainList = ({ trains, shiftManHours, onActivityMove }: TrainListProps) =>
                     availableManHours={getAvailableManHours(day, "day")}
                     onActivityMove={onActivityMove}
                   >
+                    {/* Show overallocation alert for the first train in the column only */}
+                    {train.id === trains[0].id && isShiftOverallocated(day, "day") && (
+                      <Alert variant="destructive" className="mb-2 p-2">
+                        <AlertCircle className="h-3 w-3" />
+                        <AlertTitle className="text-xs">Column Overallocation!</AlertTitle>
+                        <AlertDescription className="text-xs">
+                          Total: {getTotalPlannedHours(day, "day")}h / {getAvailableManHours(day, "day")}h
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                    
                     {getActivitiesForCell(train, day, "day").map((activity) => (
                       <ActivityItem 
                         key={activity.id} 
@@ -71,6 +98,17 @@ const TrainList = ({ trains, shiftManHours, onActivityMove }: TrainListProps) =>
                     availableManHours={getAvailableManHours(day, "night")}
                     onActivityMove={onActivityMove}
                   >
+                    {/* Show overallocation alert for the first train in the column only */}
+                    {train.id === trains[0].id && isShiftOverallocated(day, "night") && (
+                      <Alert variant="destructive" className="mb-2 p-2">
+                        <AlertCircle className="h-3 w-3" />
+                        <AlertTitle className="text-xs">Column Overallocation!</AlertTitle>
+                        <AlertDescription className="text-xs">
+                          Total: {getTotalPlannedHours(day, "night")}h / {getAvailableManHours(day, "night")}h
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                    
                     {getActivitiesForCell(train, day, "night").map((activity) => (
                       <ActivityItem 
                         key={activity.id} 

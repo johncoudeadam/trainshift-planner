@@ -8,6 +8,7 @@ interface ShiftManHoursDisplayProps {
   shift: ShiftType;
   availableManHours: number;
   plannedManHours: number;
+  showAvailable?: boolean;
 }
 
 const ShiftManHoursDisplay = ({
@@ -15,6 +16,7 @@ const ShiftManHoursDisplay = ({
   shift,
   availableManHours,
   plannedManHours,
+  showAvailable = false,
 }: ShiftManHoursDisplayProps) => {
   const isOverAllocated = plannedManHours > availableManHours;
 
@@ -22,19 +24,9 @@ const ShiftManHoursDisplay = ({
     <div className="text-xs p-1">
       <div className="flex justify-between items-center">
         <span className={isOverAllocated ? "text-red-600 font-bold" : "text-gray-700"}>
-          {plannedManHours}h / {availableManHours}h
+          {showAvailable ? `${plannedManHours}h / ${availableManHours}h` : `${plannedManHours}h`}
         </span>
       </div>
-      
-      {isOverAllocated && (
-        <Alert variant="destructive" className="mt-1 p-2">
-          <AlertCircle className="h-3 w-3" />
-          <AlertTitle className="text-xs">Resource Overallocation!</AlertTitle>
-          <AlertDescription className="text-xs">
-            Exceeds by {plannedManHours - availableManHours} hours
-          </AlertDescription>
-        </Alert>
-      )}
     </div>
   );
 };
