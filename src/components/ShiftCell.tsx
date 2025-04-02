@@ -1,3 +1,4 @@
+
 import { ReactNode } from "react";
 import { useDrop } from "react-dnd";
 import { ShiftType, Activity } from "@/lib/types";
@@ -25,6 +26,15 @@ interface ShiftCellProps {
   ) => void;
 }
 
+// Define the DragItem interface to include manHours
+interface DragItem {
+  id: string;
+  trainId: string;
+  optimalDay: number;
+  optimalShift: ShiftType;
+  manHours: number;
+}
+
 const ShiftCell = ({ 
   children, 
   trainId, 
@@ -36,18 +46,13 @@ const ShiftCell = ({
 }: ShiftCellProps) => {
   const [{ isOver, canDrop, item }, drop] = useDrop({
     accept: "activity",
-    drop: (item: { id: string; trainId: string; optimalDay: number; optimalShift: ShiftType }) => {
+    drop: (item: DragItem) => {
       onActivityMove(item.id, item.trainId, day, shift);
     },
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
       canDrop: !!monitor.canDrop(),
-      item: monitor.getItem() as { 
-        id: string; 
-        trainId: string; 
-        optimalDay: number; 
-        optimalShift: ShiftType 
-      } | null,
+      item: monitor.getItem() as DragItem | null,
     }),
   });
 

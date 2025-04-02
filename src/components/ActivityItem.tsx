@@ -16,7 +16,8 @@ const ActivityItem = ({ activity, trainId }: ActivityItemProps) => {
       id: activity.id, 
       trainId,
       optimalDay: activity.optimalDay,
-      optimalShift: activity.optimalShift
+      optimalShift: activity.optimalShift,
+      manHours: activity.manHours // Add the manHours property
     },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
