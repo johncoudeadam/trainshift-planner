@@ -18,6 +18,7 @@ interface ShiftCellProps {
   shift: ShiftType;
   activities: Activity[];
   availableManHours: number;
+  isLockMode: boolean;
   onActivityMove: (
     activityId: string,
     trainId: string,
@@ -33,6 +34,9 @@ interface DragItem {
   optimalDay: number;
   optimalShift: ShiftType;
   manHours: number;
+  isLocked?: boolean;
+  originalDay?: number;
+  originalShift?: ShiftType;
 }
 
 const ShiftCell = ({ 
@@ -42,12 +46,20 @@ const ShiftCell = ({
   shift, 
   activities, 
   availableManHours,
+  isLockMode,
   onActivityMove 
 }: ShiftCellProps) => {
   const [{ isOver, canDrop, item }, drop] = useDrop({
     accept: "activity",
     drop: (item: DragItem) => {
-      onActivityMove(item.id, item.trainId, day, shift);
+      // If the activity is locked, it should return to its original position
+      if (item.isLocked) {
+        if (item.originalDay !== undefined && item.originalShift !== undefined) {
+          onActivityMove(item.id, item.trainId, item.originalDay, item.originalShift);
+        }
+      } else {
+        onActivityMove(item.id, item.trainId, day, shift);
+      }
     },
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
@@ -66,7 +78,7 @@ const ShiftCell = ({
   
   // Determine highlight color based on proximity to optimal day
   const getProximityHighlight = () => {
-    if (!item || !isSameTrain) return "";
+    if (!item || !isSameTrain || isLockMode) return "";
     
     const dayDifference = Math.abs(day - item.optimalDay);
     
@@ -94,8 +106,10 @@ const ShiftCell = ({
     <div
       className={cn(
         "p-2 min-h-[120px] transition-colors flex flex-col w-full h-full",
-        shift === "day" ? "bg-blue-50 border-r" : "bg-indigo-50",
-        isOver && canDrop && "bg-green-300",
+        shift === "day" ? 
+          isLockMode ? "bg-gray-100 border-r" : "bg-blue-50 border-r" : 
+          isLockMode ? "bg-gray-200" : "bg-indigo-50",
+        isOver && canDrop && !isLockMode && "bg-green-300",
         getProximityHighlight(),
         plannedManHours > availableManHours ? "border-red-500 border-2" : ""
       )}
@@ -114,8 +128,8 @@ const ShiftCell = ({
   );
 
   return (
-    <div ref={drop} className="w-full h-full">
-      {isDraggingOver ? (
+    <div ref={!isLockMode ? drop : undefined} className="w-full h-full">
+      {isDraggingOver && !isLockMode ? (
         <Tooltip>
           <TooltipTrigger asChild>
             {cellContent}

@@ -7,15 +7,23 @@ import { TrainFront } from "lucide-react";
 interface TrainListProps {
   trains: Train[];
   shiftManHours: ShiftManHours[];
+  isLockMode: boolean;
   onActivityMove: (
     activityId: string,
     trainId: string, 
     targetDay: number,
     targetShift: ShiftType
   ) => void;
+  onToggleLock: (activityId: string, trainId: string, locked: boolean) => void;
 }
 
-const TrainList = ({ trains, shiftManHours, onActivityMove }: TrainListProps) => {
+const TrainList = ({ 
+  trains, 
+  shiftManHours, 
+  isLockMode,
+  onActivityMove,
+  onToggleLock 
+}: TrainListProps) => {
   // Generate day numbers (0-13) for 2 weeks
   const days = Array.from({ length: 14 }, (_, i) => i);
   
@@ -65,13 +73,17 @@ const TrainList = ({ trains, shiftManHours, onActivityMove }: TrainListProps) =>
                     shift="day"
                     activities={getActivitiesForCell(train, day, "day")}
                     availableManHours={getAvailableManHours(day, "day")}
+                    isLockMode={isLockMode}
                     onActivityMove={onActivityMove}
                   >
                     {getActivitiesForCell(train, day, "day").map((activity) => (
                       <ActivityItem 
                         key={activity.id} 
                         activity={activity} 
-                        trainId={train.id} 
+                        trainId={train.id}
+                        isLockMode={isLockMode}
+                        onToggleLock={onToggleLock}
+                        onUpdateActivity={onActivityMove}
                       />
                     ))}
                   </ShiftCell>
@@ -83,13 +95,17 @@ const TrainList = ({ trains, shiftManHours, onActivityMove }: TrainListProps) =>
                     shift="night"
                     activities={getActivitiesForCell(train, day, "night")}
                     availableManHours={getAvailableManHours(day, "night")}
+                    isLockMode={isLockMode}
                     onActivityMove={onActivityMove}
                   >
                     {getActivitiesForCell(train, day, "night").map((activity) => (
                       <ActivityItem 
                         key={activity.id} 
                         activity={activity} 
-                        trainId={train.id} 
+                        trainId={train.id}
+                        isLockMode={isLockMode}
+                        onToggleLock={onToggleLock}
+                        onUpdateActivity={onActivityMove}
                       />
                     ))}
                   </ShiftCell>

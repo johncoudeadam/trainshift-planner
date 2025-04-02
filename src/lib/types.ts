@@ -11,6 +11,7 @@ export interface Activity {
   optimalShift: ShiftType;
   isOutOfOptimalTime: boolean;
   manHours: number; // Number of man-hours required for this activity
+  isLocked?: boolean; // Whether this activity is locked to its current shift
 }
 
 export interface Train {
