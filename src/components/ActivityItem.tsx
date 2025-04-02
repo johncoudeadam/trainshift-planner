@@ -85,18 +85,18 @@ const ActivityItem = ({
       )}
     >
       <div className="flex justify-between items-center">
-        <span className="truncate mr-1">{activity.name}</span>
-        <div className="flex items-center gap-1">
+        <span className="truncate mr-1 flex-grow">{activity.name}</span>
+        <div className="flex items-center gap-1 text-xs">
           {activity.isLocked && !isLockMode && (
             <Lock size={10} className="text-yellow-300" />
           )}
-          <span className="flex items-center gap-1 whitespace-nowrap bg-black/20 px-1 rounded">
-            <Clock size={10} />
+          <span className="flex items-center gap-1 bg-black/20 px-1 rounded whitespace-nowrap">
+            <Clock size={8} />
             {activity.manHours}h
           </span>
           {isLockMode && (
             <Switch 
-              className="scale-75 ml-1" 
+              className="scale-[0.6] ml-1" 
               checked={activity.isLocked}
               onCheckedChange={handleLockToggle}
             />
